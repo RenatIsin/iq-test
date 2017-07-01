@@ -1,5 +1,6 @@
 package com.iqoptions.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
@@ -11,6 +12,7 @@ public class Response {
     private Message message;
     private int code;
     private int[] codeList;
+    private Object result;
 
 
     public boolean isSuccessful() {
@@ -45,4 +47,11 @@ public class Response {
         this.codeList = codeList;
     }
 
+    public Object getResult() {
+        return result;
+    }
+
+    public void setResult(Object result) {
+        this.result = result;
+    }
 }

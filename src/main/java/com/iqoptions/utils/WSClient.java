@@ -1,11 +1,13 @@
 package com.iqoptions.utils;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iqoptions.dto.SocketData;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFactory;
-import io.restassured.http.Cookie;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,11 +21,10 @@ public class WSClient  {
     private final WebSocket webSocket;
     private List<String> messages = new ArrayList<String>();
 
-    public WSClient(String url, Cookie cookie)  {
+    public WSClient(String url)  {
         try {
             webSocket = new WebSocketFactory()
                     .createSocket(url)
-                    .addHeader("Cookie", cookie.toString())
                     .addListener(new WebSocketAdapter() {
                         @Override
                         public void onTextMessage(WebSocket ws, String message) {
@@ -36,7 +37,20 @@ public class WSClient  {
         }
     }
 
-    public WebSocket socket(){
+    public WSClient send(SocketData request){
+        try {
+            if(!socket().isOpen()){
+                socket().connect();
+            }
+            String message = new ObjectMapper().writeValueAsString(request);
+            socket().sendText(message);
+        } catch (JsonProcessingException | WebSocketException e) {
+            throw new AssertionError(e);
+        }
+        return this;
+    }
+
+    private WebSocket socket(){
         return webSocket;
     }
 
